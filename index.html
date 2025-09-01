@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Survivors Camp</title>
+    </head>
+    <body
+        style="
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+        "
+    >
+        <div style="text-align: center; margin-bottom: 24px">
+            <h1 style="margin: 0; font-size: 2rem">Survivors Camp</h1>
+        </div>
+        <div
+            style="
+                background: #f4f4f4;
+                padding: 12px 20px;
+                border-radius: 8px;
+                font-size: 1.1rem;
+                text-align: center;
+                margin-bottom: 24px;
+            "
+        >
+            <span><strong>Day:</strong> <span id="status-day">1</span></span> |
+            <span><strong>Food:</strong> <span id="status-food">10</span></span>
+            |
+            <span
+                ><strong>Morale:</strong>
+                <span id="status-morale">100</span></span
+            >
+            |
+            <span><strong>Wood:</strong> <span id="status-wood">5</span></span>
+        </div>
+        <div
+            id="message-line"
+            style="
+                margin-bottom: 20px;
+                font-size: 1.1rem;
+                color: #333;
+                text-align: center;
+            "
+        >
+            game message goes here
+        </div>
+        <div
+            id="gameover-label"
+            style="
+                color: #b71c1c;
+                font-weight: bold;
+                font-size: 1.3rem;
+                margin-bottom: 20px;
+                text-align: center;
+            "
+        >
+            Game Over
+        </div>
+        <div
+            id="actions"
+            style="display: flex; gap: 16px; justify-content: center"
+        >
+            <button id="action-forage" onclick="performAction('forage')">
+                Forage for Food
+            </button>
+            <button id="action-chop" onclick="performAction('chop')">
+                Chop Wood
+            </button>
+            <button id="action-rest" onclick="performAction('rest')">
+                Rest in Shelter
+            </button>
+            <button id="action-trade" onclick="performAction('trade')">
+                Trade with Merchant
+            </button>
+        </div>
+
+        <button
+            id="restartgame"
+            style="display: none"
+            onclick="window.location.reload()"
+        >
+            Restart Game
+        </button>
+
+        <script type="module">
+            import { updateUI } from "./src/ui.js";
+            import { updateState, getState } from "./src/game.js";
+
+            updateUI(getState()); // Initial UI Update
+
+            const checkTradeAvailability = (wood) => {
+                // Disable "Trade with Merchant" button if no wood is available
+                const tradeButton = document.getElementById("action-trade");
+                tradeButton.disabled = wood <= 0;
+            };
+
+            const gameOver = (gameover) => {
+                if (gameover) {
+                    document.getElementById("actions").style.display = "none";
+                    document.getElementById("restartgame").style.display =
+                        "inline-block";
+                }
+            };
+            // On click event
+            window.performAction = (action) => {
+                updateState(action);
+                const state = getState();
+                updateUI(state);
+                checkTradeAvailability(state.wood);
+                gameOver(state.gameover);
+            };
+        </script>
+    </body>
+</html>
