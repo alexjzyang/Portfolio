@@ -27,7 +27,7 @@
 //     return msg;
 // }
 
-const DAILY_MESSAGES = {
+const THE_STORY = {
     1: [
         "The camp is quiet as you prepare for the days ahead.",
         "Morning light breaks gently through the trees.",
@@ -64,14 +64,14 @@ const DAILY_MESSAGES = {
         "The silence feels almost sacred this morning.",
     ],
     8: [
-        "The final day dawns, and you are still here.\n THE END",
-        "Hope flickers like the dying embers of the fire.\n THE END",
-        "You have come so far, but the end is in sight.\n THE END",
+        "The final day dawns, and you are still here.\nTHE END",
+        "Hope flickers like the dying embers of the fire.\nTHE END",
+        "You have come so far, but the end is in sight.\nTHE END",
     ],
 };
 
-export function dailyMessage(day) {
-    const options = DAILY_MESSAGES[day] || [];
+export function getStory(day) {
+    const options = THE_STORY[day] || [];
     if (options.length === 0) return "";
     return options[Math.floor(Math.random() * options.length)];
 }

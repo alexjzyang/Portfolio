@@ -13,6 +13,8 @@ const INITIAL_FOOD = 5;
 const INITIAL_MORALE = 2;
 const INITIAL_WOOD = 2;
 
+let message;
+
 function rand(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
@@ -22,7 +24,7 @@ forage = () => {
     food += foragedFood;
     morale -= 1;
 
-    console.log(`Foraged ${foragedFood} food; Morale decreased by 1.`);
+    message += `Foraged ${foragedFood} food; Morale decreased by 1.\n`;
 };
 
 chop = () => {
@@ -30,14 +32,14 @@ chop = () => {
     wood += choppedWood;
     food -= 1;
 
-    console.log(`Chopped ${choppedWood} wood; Food decreased by 1.`);
+    message += `Chopped ${choppedWood} wood; Food decreased by 1.\n`;
 };
 
 rest = () => {
     morale += 2;
     food -= 1;
 
-    console.log(`Rested; Morale increased by 2; Food decreased by 1.`);
+    message += `Rested; Morale increased by 2; Food decreased by 1.\n`;
 };
 
 trade = () => {
@@ -45,13 +47,12 @@ trade = () => {
         let tradedFood = rand(1, 3);
         wood -= 2;
         food += tradedFood;
-        console.log(
-            `Traded ${tradedFood} food; Wood decreased by 2; Morale increased by 1.`
-        );
+        message += `Traded ${tradedFood} food; Wood decreased by 2. `;
     } else {
-        console.log("Not enough wood to trade.");
+        message += `Not enough wood to trade. `;
     }
     morale += 1;
+    message += `Morale increased by 1.\n`;
 };
 
 function performAction(action) {
@@ -68,15 +69,15 @@ function performAction(action) {
 
 function checkCondition() {
     if (food <= 0) {
-        console.log("You have run out of food!");
+        message += `You have run out of food!\n`;
         return true;
     }
     if (morale <= 0) {
-        console.log("Your morale has hit rock bottom!");
+        message += `Your morale has hit rock bottom!\n`;
         return true;
     }
     if (day === MAX_DAY) {
-        console.log("You have survived for a week!");
+        message += `You have survived for a week!\n`;
         return true;
     }
     return false;
@@ -87,19 +88,20 @@ function checkTradeAvailability() {
 }
 
 export function updateState(receivedAction) {
+    message = "";
     // action
     performAction(receivedAction);
     // end of day
     food -= UPKEEP;
-    console.log(`End of day ${day}: Food -${UPKEEP}`);
+    message += `End of day ${day}: Food -${UPKEEP}\n`;
     // check progress
     gameover = checkCondition();
     day++;
-    console.log(`Day ${day}: Food ${food}, Morale ${morale}, Wood ${wood}`);
+    // console.log(`Day ${day}: Food ${food}, Morale ${morale}, Wood ${wood}`);
 }
 
 export function getState() {
-    return { day, food, morale, wood, gameover };
+    return { day, food, morale, wood, gameover, message };
 }
 
 function initializeGame() {
@@ -108,7 +110,8 @@ function initializeGame() {
     morale = INITIAL_MORALE;
     wood = INITIAL_WOOD;
     gameover = false;
-    console.log(`Day ${day}: Food ${food}, Morale ${morale}, Wood ${wood}`);
+    message = "";
+    // console.log(`Day ${day}: Food ${food}, Morale ${morale}, Wood ${wood}`);
 }
 
 initializeGame();

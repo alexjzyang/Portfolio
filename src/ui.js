@@ -1,4 +1,4 @@
-import { dailyMessage } from "./messages.js";
+import { getStory } from "./messages.js";
 export function updateUI(state) {
     const dayEl = document.getElementById("status-day");
     const foodEl = document.getElementById("status-food");
@@ -15,6 +15,9 @@ export function updateUI(state) {
         ? (gameoverLabelEl.innerText = "Game Over")
         : (gameoverLabelEl.innerText = "");
 
+    const storyLineEl = document.getElementById("story-line");
+    storyLineEl.innerText = getStory(state.day);
+
     const messageLineEl = document.getElementById("message-line");
-    messageLineEl.innerText = dailyMessage(state.day);
+    messageLineEl.innerText = state.message;
 }
