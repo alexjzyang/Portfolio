@@ -7,17 +7,11 @@ let day, food, morale, wood, gameover;
 let forage, chop, rest, trade;
 
 const UPKEEP = 2; // amount of food cost per day
-const MAX_DAY = 7;
+const MAX_DAY = 100;
 
 const INITIAL_FOOD = 5;
 const INITIAL_MORALE = 2;
 const INITIAL_WOOD = 2;
-
-day = 1;
-food = INITIAL_FOOD;
-morale = INITIAL_MORALE;
-wood = INITIAL_WOOD;
-gameover = false;
 
 function rand(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -47,14 +41,17 @@ rest = () => {
 };
 
 trade = () => {
-    const tradedFood = rand(0, 2);
-    wood -= 2;
+    if (checkTradeAvailability()) {
+        let tradedFood = rand(1, 3);
+        wood -= 2;
+        food += tradedFood;
+        console.log(
+            `Traded ${tradedFood} food; Wood decreased by 2; Morale increased by 1.`
+        );
+    } else {
+        console.log("Not enough wood to trade.");
+    }
     morale += 1;
-    food += tradedFood;
-
-    console.log(
-        `Traded ${tradedFood} food; Wood decreased by 2; Morale increased by 1.`
-    );
 };
 
 function performAction(action) {
@@ -84,20 +81,34 @@ function checkCondition() {
     }
     return false;
 }
+function checkTradeAvailability() {
+    // Disable "Trade with Merchant" button if no wood is available
+    return wood >= 2;
+}
 
 export function updateState(receivedAction) {
     // action
     performAction(receivedAction);
     // end of day
     food -= UPKEEP;
+    console.log(`End of day ${day}: Food -${UPKEEP}`);
     // check progress
     gameover = checkCondition();
     day++;
-    // return state
-    // const state = { day, food, morale, wood, gameover };
-    // return state;
+    console.log(`Day ${day}: Food ${food}, Morale ${morale}, Wood ${wood}`);
 }
 
 export function getState() {
     return { day, food, morale, wood, gameover };
 }
+
+function initializeGame() {
+    day = 1;
+    food = INITIAL_FOOD;
+    morale = INITIAL_MORALE;
+    wood = INITIAL_WOOD;
+    gameover = false;
+    console.log(`Day ${day}: Food ${food}, Morale ${morale}, Wood ${wood}`);
+}
+
+initializeGame();

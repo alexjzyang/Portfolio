@@ -57,10 +57,13 @@
                 font-size: 1.3rem;
                 margin-bottom: 20px;
                 text-align: center;
+                min-height: 1.5em;
+                visibility: hidden;
             "
         >
             Game Over
         </div>
+
         <div
             id="actions"
             style="display: flex; gap: 16px; justify-content: center"
@@ -93,15 +96,11 @@
 
             updateUI(getState()); // Initial UI Update
 
-            const checkTradeAvailability = (wood) => {
-                // Disable "Trade with Merchant" button if no wood is available
-                const tradeButton = document.getElementById("action-trade");
-                tradeButton.disabled = wood <= 0;
-            };
-
             const gameOver = (gameover) => {
                 if (gameover) {
                     document.getElementById("actions").style.display = "none";
+                    document.getElementById("gameover-label").style.visibility =
+                        "visible";
                     document.getElementById("restartgame").style.display =
                         "inline-block";
                 }
