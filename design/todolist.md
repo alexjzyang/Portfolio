@@ -2,7 +2,7 @@
 
 ### Core Systems
 
--   [ ] **Game Clock** (tick counter, day counter).
+-   [X] **Game Clock** (tick counter, day counter).
 -   [ ] **Resource Manager** (tracks food, water, wood, stone, morale).
 -   [ ] **Task System** (time cost + yield).
 -   [ ] **Crafting/Upgrades** (resource recipes → effects).

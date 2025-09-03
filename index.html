@@ -43,8 +43,8 @@
             const gameClock = GameClock(onTick);
             gameClock.init();
 
-            function onTick(state) {
-                updateTimeHud(state);
+            function onTick() {
+                updateTimeHud(gameClock);
             }
         </script>
     </body>
