@@ -1,23 +1,22 @@
-import { getStory } from "./messages.js";
-export function updateUI(state) {
-    const dayEl = document.getElementById("status-day");
-    const foodEl = document.getElementById("status-food");
-    const moraleEl = document.getElementById("status-morale");
-    const woodEl = document.getElementById("status-wood");
+// --- DOM helpers (safe if elements missing) ---
+const el = (id) => document.getElementById(id);
+const setText = (id, text) => {
+    const n = el(id);
+    if (n) n.textContent = text;
+};
+const setBarPct = (id, pct) => {
+    const n = el(id);
+    if (n) n.style.width = `${Math.max(0, Math.min(100, pct))}%`;
+};
 
-    dayEl.innerText = `${state.day}`;
-    foodEl.innerText = `${state.food}`;
-    moraleEl.innerText = `${state.morale}`;
-    woodEl.innerText = `${state.wood}`;
-
-    const gameoverLabelEl = document.getElementById("gameover-label");
-    state.gameover
-        ? (gameoverLabelEl.innerText = "Game Over")
-        : (gameoverLabelEl.innerText = "");
-
-    const storyLineEl = document.getElementById("story-line");
-    storyLineEl.innerText = getStory(state.day);
-
-    const messageLineEl = document.getElementById("message-line");
-    messageLineEl.innerText = state.message;
+export function updateTimeHud(state) {
+    setText("dayLabel", `Day ${state.day}`);
+    setText("tickLabel", `${state.tick} / ${state.config.DAY_TICKS}`);
+    setBarPct("timeBar", (state.tick / state.config.DAY_TICKS) * 100);
+    // setText(
+    //     "taskLabel",
+    //     state.inTask
+    //         ? `Working: ${state.inTask.name} (${state.inTask.remaining}t left)`
+    //         : "No task"
+    // );
 }

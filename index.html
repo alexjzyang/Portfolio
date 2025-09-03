@@ -10,118 +10,42 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
             min-height: 100vh;
             margin: 0;
         "
     >
-        <div style="text-align: center; margin-bottom: 24px">
-            <h1 style="margin: 0; font-size: 2rem">Survivors Camp</h1>
-        </div>
-        <div
-            style="
-                background: #f4f4f4;
-                padding: 12px 20px;
-                border-radius: 8px;
-                font-size: 1.1rem;
-                text-align: center;
-                margin-bottom: 24px;
-            "
-        >
-            <span><strong>Day:</strong> <span id="status-day">1</span></span> |
-            <span><strong>Food:</strong> <span id="status-food">10</span></span>
-            |
-            <span
-                ><strong>Morale:</strong>
-                <span id="status-morale">100</span></span
+        <!-- Day/Time HUD -->
+        <div id="timeHud" style="margin: 8px 0">
+            <div style="align-items: center; margin-bottom: 4px">
+                <span id="dayLabel">Day 1</span>
+                <span id="tickLabel">0 / 100</span>
+            </div>
+            <div
+                style="
+                    width: 100%;
+                    height: 10px;
+                    background: #eee;
+                    border-radius: 6px;
+                    overflow: hidden;
+                "
             >
-            |
-            <span><strong>Wood:</strong> <span id="status-wood">5</span></span>
+                <div
+                    id="timeBar"
+                    style="height: 100%; width: 0%; background: #4caf50"
+                ></div>
+            </div>
+            <!-- <div id="taskLabel" style="margin-top: 6px; opacity: 0.8">No task</div> -->
         </div>
-        <div
-            id="story-line"
-            style="
-                margin-bottom: 20px;
-                font-size: 1.1rem;
-                color: #1976d2;
-                text-align: center;
-            "
-        >
-            game story goes here
-        </div>
-        <div
-            id="message-line"
-            style="
-                margin-bottom: 20px;
-                font-size: 1rem;
-                text-align: center;
-                min-height: 1.2em;
-            "
-        ></div>
-        <div
-            id="gameover-label"
-            style="
-                color: #b71c1c;
-                font-weight: bold;
-                font-size: 1.3rem;
-                margin-bottom: 20px;
-                text-align: center;
-                min-height: 1.5em;
-                display: none;
-            "
-        >
-            Game Over
-        </div>
-
-        <div
-            id="actions"
-            style="display: flex; gap: 16px; justify-content: center"
-        >
-            <button id="action-forage" onclick="performAction('forage')">
-                Forage for Food
-            </button>
-            <button id="action-chop" onclick="performAction('chop')">
-                Chop Wood
-            </button>
-            <button id="action-rest" onclick="performAction('rest')">
-                Rest in Shelter
-            </button>
-            <button id="action-trade" onclick="performAction('trade')">
-                Trade with Merchant
-            </button>
-        </div>
-
-        <button
-            id="restartgame"
-            style="display: none"
-            onclick="window.location.reload()"
-        >
-            Restart Game
-        </button>
-
         <script type="module">
-            import { updateUI } from "./src/ui.js";
-            import { updateState, getState } from "./src/game.js";
+            import GameClock from "./src/gameclock.js";
+            import { updateTimeHud } from "./src/ui.js";
 
-            updateUI(getState()); // Initial UI Update
+            const gameClock = GameClock(onTick);
+            gameClock.init();
 
-            const gameOver = (gameover) => {
-                if (gameover) {
-                    document.getElementById("actions").style.display = "none";
-                    document.getElementById("gameover-label").style.display =
-                        "inline-block";
-                    document.getElementById("restartgame").style.display =
-                        "inline-block";
-                }
-            };
-            // On click event
-            window.performAction = (action) => {
-                updateState(action);
-                const state = getState();
-                updateUI(state);
-                // checkTradeAvailability(state.wood);
-                gameOver(state.gameover);
-            };
+            function onTick(state) {
+                updateTimeHud(state);
+            }
         </script>
     </body>
 </html>

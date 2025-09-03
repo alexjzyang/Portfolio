@@ -1,3 +1,9 @@
-import { game } from "./src/game.js";
+import GameClock from "./src/gameclock.js";
+import { updateTimeHud } from "./src/ui.js";
 
-game();
+const gameClock = GameClock(onTick);
+gameClock.init();
+
+function onTick(state) {
+    updateTimeHud(state);
+}
