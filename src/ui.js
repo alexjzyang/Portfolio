@@ -9,18 +9,8 @@ const setBarPct = (id, pct) => {
     if (n) n.style.width = `${Math.max(0, Math.min(100, pct))}%`;
 };
 
-export function updateTimeHud(clock) {
-    const state = clock.getState();
-    const config = clock.config;
-
+export function updateTimeHud({ state, config }) {
     setText("dayLabel", `Day ${state.day}`);
     setText("tickLabel", `${state.tick} / ${config.DAY_TICKS}`);
     setBarPct("timeBar", (state.tick / config.DAY_TICKS) * 100);
-
-    // setText(
-    //     "taskLabel",
-    //     state.inTask
-    //         ? `Working: ${state.inTask.name} (${state.inTask.remaining}t left)`
-    //         : "No task"
-    // );
 }

@@ -1,84 +1,62 @@
 /* =========================
-   Tick-based Day Clock + Tasks
+   Tick-based Day Clock
    ========================= */
 
-const GameClock = (onTick) => {
-    // --- Config ---
-    const DAY_TICKS = 40; // ticks per day
-    const TICK_MS = 100; // real-time ms per tick (tweak feel)
-
-    // Expose for other modules if needed
+const GameClock = () => {
+    const DAY_TICKS = 600,
+        TICK_MS = 200;
     const config = { DAY_TICKS, TICK_MS };
-
-    // --- State ---
-    const state = {
-        day: 1,
-        tick: 0, // 0..DAY_TICKS
-        timer: null, // setInterval handle
-        // inTask: null, // { key, name, remaining, onComplete }
-        paused: false,
-        // Example resources—hook these into your existing resource manager
-        // resources: { food: 0, wood: 0, morale: 10 },
+    const state = { day: 1, tick: 0, timer: null, paused: false };
+    const listeners = {
+        tick: new Set(),
+        endOfDay: new Set(),
+        update: new Set(),
     };
 
-    // --- Advance one tick ---
+    const on = (event, fn) => {
+        listeners[event]?.add(fn);
+        return () => listeners[event]?.delete(fn);
+    };
+    const emit = (event, payload) => {
+        listeners[event]?.forEach((fn) => fn(payload));
+    };
+
     function tickOnce() {
-        // if (state.paused) return;
-        console.log("Tick once");
-        // Advance global time
         state.tick += 1;
-        if (state.tick >= DAY_TICKS) {
-            endOfDay();
-        }
-        onTick();
-        // updateTimeHud();
+        emit("tick", { state, config });
+        emit("update", { state, config });
+
+        if (state.tick >= DAY_TICKS) endOfDay();
     }
     function endOfDay() {
         state.day += 1;
         state.tick = 0;
+        emit("endOfDay", { state, config });
+        emit("update", { state, config });
     }
-    // --- Controls ---
     function play() {
         if (state.timer) return;
         state.paused = false;
         state.timer = setInterval(tickOnce, TICK_MS);
-        // updateTimeHud();
+        emit("update", { state, config });
     }
-
     function pause() {
         state.paused = true;
-        if (state.timer) clearInterval(state.timer);
+        clearInterval(state.timer);
         state.timer = null;
-        // updateTimeHud();
+        emit("update", { state, config });
     }
-
     function togglePause() {
-        if (state.timer) pause();
-        else play();
+        state.timer ? pause() : play();
     }
-
-    // --- Bootstrap ---
     function init() {
-        // updateTimeHud();
-        play(); // start automatically; or call manually from your init
+        emit("update", { state, config });
+        play();
     }
-
-    // --- Getters ---
     function getState() {
         return state;
     }
-    // --- Expose ---
-    return {
-        init,
-        play,
-        pause,
-        togglePause,
-        getState,
-        // startTask,
-        config,
-        // state, // expose for debugging/dev tools
-        // TASKS, // so you can add/modify tasks elsewhere
-    };
-};
 
+    return { init, play, pause, togglePause, on, getState, config };
+};
 export default GameClock;

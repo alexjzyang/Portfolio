@@ -40,12 +40,17 @@
             import GameClock from "./src/gameclock.js";
             import { updateTimeHud } from "./src/ui.js";
 
-            const gameClock = GameClock(onTick);
+            const gameClock = GameClock();
             gameClock.init();
 
-            function onTick() {
-                updateTimeHud(gameClock);
-            }
+            const offUI = gameClock.on("update", ({ state, config }) => {
+                updateTimeHud({ state, config });
+            });
+
+            // const offRes = clock.on("endOfDay", () =>
+            //     resources.applyEndOfDay()
+            // );
+            // const offAct = clock.on("tick", () => actions.progressOneTick());
         </script>
     </body>
 </html>
