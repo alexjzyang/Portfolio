@@ -2,7 +2,7 @@
    Tick-based Day Clock
    ========================= */
 
-const GameClock = () => {
+const GameClock = (maxTicks) => {
     const DAY_TICKS = 600,
         TICK_MS = 200;
     const config = { DAY_TICKS, TICK_MS };
@@ -12,6 +12,7 @@ const GameClock = () => {
         endOfDay: new Set(),
         update: new Set(),
     };
+    let maxDayTicks = maxTicks || Infinity;
 
     const on = (event, fn) => {
         listeners[event]?.add(fn);
@@ -25,8 +26,8 @@ const GameClock = () => {
         state.tick += 1;
         emit("tick", { state, config });
         emit("update", { state, config });
-
         if (state.tick >= DAY_TICKS) endOfDay();
+        if ((maxDayTicks -= 1) <= 0) pause();
     }
     function endOfDay() {
         state.day += 1;
@@ -41,10 +42,10 @@ const GameClock = () => {
         emit("update", { state, config });
     }
     function pause() {
+        if (!state.paused) emit("update", { state, config });
         state.paused = true;
         clearInterval(state.timer);
         state.timer = null;
-        emit("update", { state, config });
     }
     function togglePause() {
         state.timer ? pause() : play();

@@ -192,3 +192,90 @@ export class ResourcesManager {
 export function createDefaultResourcesManager() {
     return new ResourcesManager();
 }
+
+let TASK_ID_SEQ = 1;
+class Task {
+    constructor(name, yieldSpec) {
+        this.id = TASK_ID_SEQ++;
+        this.name = name;
+        // Snapshot duration/amount at creation in case balance changes later
+        this.duration = yieldSpec?.duration || 0;
+        this.amount = yieldSpec?.amount || 0;
+        this._progress = this.duration;
+    }
+    tick(ticks = 1) {
+        this._progress -= ticks;
+        return this._progress <= 0;
+    }
+    timeRemaining() {
+        return Math.max(0, this._progress);
+    }
+}
+
+export class TaskQueue {
+    constructor(resourceManager) {
+        this.tasks = [];
+        this.currentTask = null;
+        this.resourceManager = resourceManager;
+    }
+    addTask(taskName) {
+        const res = this.resourceManager.get(taskName);
+        if (!res || !res.gatherSpec) return null;
+        const task = new Task(taskName, res.gatherSpec);
+        this.tasks.push(task);
+        if (!this.currentTask) this.startNextTask();
+        return task;
+    }
+    startNextTask() {
+        if (this.tasks.length && !this.currentTask) {
+            this.currentTask = this.tasks.shift() || null;
+        }
+        return this.currentTask;
+    }
+    // Cancel the currently running task (no reward) and start the next one
+    cancelCurrentTask() {
+        if (!this.currentTask) return null;
+        const cancelled = this.currentTask;
+        this.currentTask = null;
+        this.startNextTask();
+        return cancelled;
+    }
+    // Remove a pending task by 0-based index; returns the removed task or null
+    removePendingByIndex(index) {
+        if (index < 0 || index >= this.tasks.length) return null;
+        const [removed] = this.tasks.splice(index, 1);
+        return removed || null;
+    }
+    // Remove a task by id. If it's the current task, cancels with no reward.
+    removeById(taskId) {
+        if (this.currentTask && this.currentTask.id === taskId) {
+            return this.cancelCurrentTask();
+        }
+        const idx = this.tasks.findIndex((t) => t.id === taskId);
+        if (idx !== -1) return this.removePendingByIndex(idx);
+        return null;
+    }
+    completeCurrentTask() {
+        if (!this.currentTask) return null;
+        const completed = this.currentTask;
+        this.currentTask = null;
+        // Apply the resource gain respecting caps/spoilage rules
+        const res = this.resourceManager.get(completed.name);
+        if (res) res.add(completed.amount, this.resourceManager.day);
+        // Immediately begin next task if available
+        this.startNextTask();
+        return completed;
+    }
+    tick(ticks = 1) {
+        if (!this.currentTask) this.startNextTask();
+        if (!this.currentTask) return null;
+        if (this.currentTask.tick(ticks)) {
+            // if complete, auto-start next task
+            this.completeCurrentTask();
+        }
+    }
+}
+
+
+
+
