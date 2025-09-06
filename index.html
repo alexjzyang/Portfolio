@@ -74,6 +74,9 @@
                 });
             });
 
+            clock.on("endOfDay", ({ state }) => {
+                if (state.day === 5) close.pause;
+            });
             clock.init();
         </script>
     </body>

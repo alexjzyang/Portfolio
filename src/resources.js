@@ -110,10 +110,6 @@ export class ResourcesManager {
             ...config,
             initial: { ...CONSTANTS.initial, ...(config.initial || {}) },
             dailyUse: { ...CONSTANTS.dailyUse, ...(config.dailyUse || {}) },
-            moralePerDay: {
-                ...CONSTANTS.moralePerDay,
-                ...(config.moralePerDay || {}),
-            },
             yields: { ...CONSTANTS.yields, ...(config.yields || {}) },
             caps: { ...CONSTANTS.caps, ...(config.caps || {}) },
             spoilageDays: {

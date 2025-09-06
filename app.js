@@ -1,34 +1,57 @@
-// import GameClock from "./src/gameclock.js";
+import GameClock from "./src/gameclock.js";
 // import { updateTimeHud } from "./src/ui.js";
+import { createDefaultResourcesManager } from "./src/resources.js";
+import { createDefaultMorale, applyFireModifier } from "./src/morale.js";
 
-import { Resource, Yield } from "./src/resources";
+const clock = GameClock();
+const resources = createDefaultResourcesManager();
+const morale = createDefaultMorale();
 
-// const gameClock = GameClock(onTick);
-// gameClock.init();
-// console.log("clock is " + gameClock);
+// Keep morale modifier aligned with current fire state
+applyFireModifier(morale, resources.getState().fireOn);
+morale.setModifier("test", { add: 0, mul: 10 });
 
-// function onTick(clock) {
-//     updateTimeHud(clock);
-// }
+// HUD updates
+const offUI = clock.on("update", ({ state, config }) => {
+    // updateTimeHud({ state, config });
 
-const INITIAL_FOOD = 5;
-const INITIAL_MORALE = 5;
-const INITIAL_WATER = 3;
-const INITIAL_WOOD = 0;
-// const INITIAL_STONE = 0;
-const FOOD_YIELD = new Yield(40, 3);
-const WATER_YIELD = new Yield(80, 5);
-// const MORALE_YIELD = new Yield(20,2);
-const WOOD_YIELD = new Yield(65, 2);
-// const STONE_YIELD = new Yield(1, 4);
+    if (state.tick == 10) {
+        console.log(resources.getState());
+    }
+    if (state.tick == 20) {
+        resources.gather("food");
+        console.log(resources.getState());
+    }
+    if (state.tick == 30) {
+        resources.gather("food");
+        resources.gather("water");
+        resources.gather("wood");
+        console.log(resources.getState());
+    }
+    if (state.tick == 40) {
+    }
+    if (state.tick >= 50 && !state.paused) {
+        clock.pause();
+        console.log(resources.getState());
+        // console.log(morale.getState());
+    }
+});
 
-const food = new Resource("food", INITIAL_FOOD, FOOD_YIELD);
-const water = new Resource("water", INITIAL_WATER, WATER_YIELD);
-// const morale = new Resource("morale", INITIAL_MORALE, MORALE_YIELD);
-const wood = new Resource("wood", INITIAL_WOOD, WOOD_YIELD);
-// const stone = new Resource("stone", INITIAL_STONE, STONE_YIELD);
+// Per-tick morale drain
+const offTick = clock.on("tick", ({ state, config }) => {
+    morale.tick(1, config.DAY_TICKS);
+});
 
-// Daily Consumption (Phase 1)
-// Food: –10
-// Water: –8
-// Firewood: –4
+// // End-of-day resource processing; update morale fire modifier
+// const offEnd = clock.on("endOfDay", () => {
+//     const summary = resources.applyEndOfDay();
+//     applyFireModifier(morale, summary.fireOn);
+//     // Basic console trace for now
+//     console.log("EOD:", {
+//         resources: resources.getState(),
+//         morale: morale.getState(clock.config.DAY_TICKS),
+//         summary,
+//     });
+// });
+
+clock.init();

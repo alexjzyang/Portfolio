@@ -74,6 +74,9 @@ export class MoraleMeter {
             baseRatePerDay: this.baseRatePerDay,
             effectiveRatePerDay: perDay,
             effectiveRatePerTick: perDay / dayTicks,
+            modifiers: Array.from(this.modifiers.entries()).map(
+                ([name, mod]) => ({ name, ...mod })
+            ),
         };
     }
 }
@@ -90,4 +93,3 @@ export function applyFireModifier(morale, fireOn) {
     // mul=1 when fire on; mul=2 when fire off doubles decay
     morale.setModifier("fire", { add: 0, mul: fireOn ? 1 : 2 });
 }
-
