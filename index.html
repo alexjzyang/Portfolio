@@ -39,18 +39,42 @@
         <script type="module">
             import GameClock from "./src/gameclock.js";
             import { updateTimeHud } from "./src/ui.js";
+            import { createDefaultResourcesManager } from "./src/resources.js";
+            import {
+                createDefaultMorale,
+                applyFireModifier,
+            } from "./src/morale.js";
 
-            const gameClock = GameClock();
-            gameClock.init();
+            const clock = GameClock();
+            const resources = createDefaultResourcesManager();
+            const morale = createDefaultMorale();
 
-            const offUI = gameClock.on("update", ({ state, config }) => {
+            // Keep morale modifier aligned with current fire state
+            applyFireModifier(morale, resources.getState().fireOn);
+
+            // HUD updates
+            const offUI = clock.on("update", ({ state, config }) => {
                 updateTimeHud({ state, config });
             });
 
-            // const offRes = clock.on("endOfDay", () =>
-            //     resources.applyEndOfDay()
-            // );
-            // const offAct = clock.on("tick", () => actions.progressOneTick());
+            // Per-tick morale drain
+            const offTick = clock.on("tick", ({ state, config }) => {
+                morale.tick(1, config.DAY_TICKS);
+            });
+
+            // End-of-day resource processing; update morale fire modifier
+            const offEnd = clock.on("endOfDay", () => {
+                const summary = resources.applyEndOfDay();
+                applyFireModifier(morale, summary.fireOn);
+                // Basic console trace for now
+                console.log("EOD:", {
+                    resources: resources.getState(),
+                    morale: morale.getState(clock.config.DAY_TICKS),
+                    summary,
+                });
+            });
+
+            clock.init();
         </script>
     </body>
 </html>
